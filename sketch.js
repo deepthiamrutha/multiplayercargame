@@ -1,45 +1,41 @@
-var ball;
-var database,position;
+var canvas, backgroundImage;
+
+var gameState = 0;
+var playerCount;
+var allPlayers;
+var distance = 0;
+var database;
+
+var form, player, game;
+
+var cars, car1, car2, car3, car4;
+var car1_img,car2_img,car3_img,car4_img,track_img;
+function preload(){
+  track_img=loadImage("images/track.jpg");
+  car1_img=loadImage("images/car1.png");
+  car2_img=loadImage("images/car2.png");
+  car3_img=loadImage("images/car3.png");
+  car4_img=loadImage("images/car4.png");
+}
+
 function setup(){
-    createCanvas(500,500);
-    ball = createSprite(250,250,10,10);
-    ball.shapeColor = "red";
-    database=firebase.database();
-     var loc=database.ref('ball/position');
-     loc.on("value",readPos,showErr);
+  canvas = createCanvas(displayWidth - 20, displayHeight-30);
+  database = firebase.database();
+  game = new Game();
+  game.getState();
+  game.start();
 }
 
 
 function draw(){
-    background("white");
-    if(position!==undefined){
-    if(keyDown(LEFT_ARROW)){
-        writePosition(-1,0);
-    }
-    else if(keyDown(RIGHT_ARROW)){
-        writePosition(1,0);
-    }
-    else if(keyDown(UP_ARROW)){
-        writePosition(0,-1);
-    }
-    else if(keyDown(DOWN_ARROW)){
-        writePosition(0,+1);
-    }
-    drawSprites();
-}
-}
-
-function writePosition(x,y){
-    database.ref('ball/position').set({
-        'x':position.x+x,
-        'y':position.y+y})
-}
-function readPos(data){
-    position=data.val();
-    console.log(position);
-    ball.x=position.x;
-    ball.y=position.y;
-}
-function showErr(){
-    console.log("Error");
+  if(playerCount === 4){
+    game.update(1);
+  }
+  if(gameState === 1){
+    clear();
+    game.play();
+  }
+  if(gameState ===2){
+    game.end();
+  }
 }
